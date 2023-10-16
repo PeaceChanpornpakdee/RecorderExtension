@@ -1,19 +1,21 @@
-const targetNode = document.documentElement;
+let recording_status = "Idle"
 
-const observerOptions = {
-  childList: true,
-  subtree: true,
-};
-
-const observer = new MutationObserver((mutations) => {
-  mutations.forEach((mutation) => {
-    const btnRecording = document.querySelector('.btn-recording');
-    if (btnRecording) {
-      chrome.runtime.sendMessage({ action: 'startRecording' });
-    } else {
-      chrome.runtime.sendMessage({ action: 'stopRecording' });
+setInterval(function()
+{
+    if(recording_status == "Idle"){
+        const targetElement1 = document.querySelector('div.recorder-recording');
+        if(targetElement1) {
+            console.log("Start Recording");
+            recording_status = "Recording";
+        }
     }
-  });
-});
 
-observer.observe(targetNode, observerOptions);
+    if(recording_status == "Recording"){
+        const targetElement2 = document.querySelector('div.recorder-waiting');
+        if(targetElement2) {
+            console.log("Stop Recording");  
+            recording_status = "Idle";
+        }
+    }
+
+}, 500);
