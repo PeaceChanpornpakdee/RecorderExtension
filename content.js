@@ -1,5 +1,3 @@
-import Mp3MediaRecorder from 'mp3-mediarecorder';
-
 let recording_status = "Idle"
 
 setInterval(function()
@@ -24,46 +22,47 @@ setInterval(function()
 
 }, 500);
 
-let mediaRecorder;
+let recordingChunks = [];
 let recording = false;
-let audioChunks = [];
 
 function startRecording() {
     if (!recording) {
-        navigator.mediaDevices.getUserMedia({ audio: true })
+      navigator.mediaDevices.getUserMedia({ audio: true })
         .then(stream => {
-            mediaRecorder = new Mp3MediaRecorder(stream);
-            mediaRecorder.start();
-
-            mediaRecorder.ondataavailable = (event) => {
-                audioChunks.push(event.data);
-            };
-
-            mediaRecorder.onstop = () => {
-                saveRecording();
-            };
-
-            recording = true;
+          mediaRecorder = new MediaRecorder(stream);
+          mediaRecorder.start();
+  
+          mediaRecorder.ondataavailable = (event) => {
+            if (event.data.size > 0) {
+              recordingChunks.push(event.data);
+            }
+          };
+  
+          mediaRecorder.onstop = () => {
+            saveRecording();
+          };
+  
+          recording = true;
         });
     }
 }
-
+  
 function stopRecording() {
     if (recording && mediaRecorder) {
         mediaRecorder.stop();
         recording = false;
     }
 }
-
+  
 function saveRecording() {
-    if (audioChunks.length > 0) {
-        const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
-        const url = URL.createObjectURL(audioBlob);
+    if (recordingChunks.length > 0) {
+        const blob = new Blob(recordingChunks, { type: 'audio/wav' });
+        const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'recorded_audio.mp3';
+        a.download = 'recorded_audio.wav';
         a.click();
+        recordingChunks = [];
         URL.revokeObjectURL(url);
-        audioChunks = [];
     }
 }
