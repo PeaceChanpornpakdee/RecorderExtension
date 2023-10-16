@@ -1,13 +1,12 @@
-document.getElementById('startRecording').addEventListener('click', () => {
-    chrome.scripting.executeScript({
-      target: { tabId: activeTab.id },
-      func: startRecording,
-    });
-  });
-  
-  document.getElementById('stopRecording').addEventListener('click', () => {
-    chrome.scripting.executeScript({
-      target: { tabId: activeTab.id },
-      func: stopRecording,
-    });
-  });
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('startButton').addEventListener('click', startRecording);
+    document.getElementById('stopButton' ).addEventListener('click', stopRecording );
+});
+
+function startRecording() {
+    alert('Start Recording');
+}
+
+function stopRecording() {
+    alert('Stop Recording');
+}
