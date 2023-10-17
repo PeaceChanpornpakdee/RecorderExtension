@@ -39,7 +39,7 @@ function startRecording() {
           };
   
           mediaRecorder.onstop = () => {
-            saveRecording();
+            sendRecording();
           };
   
           recording = true;
@@ -54,15 +54,30 @@ function stopRecording() {
     }
 }
   
-function saveRecording() {
+async function sendRecording() {
     if (recordingChunks.length > 0) {
         const blob = new Blob(recordingChunks, { type: 'audio/wav' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'recorded_audio.wav';
-        a.click();
-        recordingChunks = [];
-        URL.revokeObjectURL(url);
+        const formData = new FormData();
+        formData.append('file', blob, 'audio.wav');
+        const response = await fetch('https://positive.co.th/englishX/wp-json/audio/v1/convert', {
+            method: 'POST',
+            body: formData,
+            // headers: {
+            // Authorization: 'Bearer YOUR_WP_API_TOKEN' // Replace with your WordPress API token
+            // }
+        });
+
+        if (response.ok) {
+            alert('File uploaded successfully!');
+        } else {
+            alert('Error uploading file');
+        }
+        // const url = URL.createObjectURL(blob);
+        // const a = document.createElement('a');
+        // a.href = url;
+        // a.download = 'recorded_audio.wav';
+        // a.click();
+        // recordingChunks = [];
+        // URL.revokeObjectURL(url);
     }
 }
