@@ -1,10 +1,13 @@
 let recording_status = "Idle";
 let student_name = "Anonymous";
+let activity_name = "Activity";
 
 function saveStudentName(name){
-    chrome.storage.local.set({ 'studentName': name }).then(() => {
-        console.log('Save Student: ' + name);
-    });
+    try{
+        chrome.storage.local.set({ 'studentName': name }).then(() => {
+            console.log('Save Student: ' + name);
+        });
+    } catch(err){}
 }
 
 function getStudentName(){
@@ -18,15 +21,46 @@ function getStudentName(){
     }
 }
 
+function saveActivityName(name){
+    try{
+        chrome.storage.local.set({ 'activityName': name }).then(() => {
+            console.log('Save Activity: ' + name);
+        });
+    } catch(err){}
+}
+
+function getActivityName(){
+    try{
+        chrome.storage.local.get(["activityName"]).then((result) => {
+            console.log('Get Activity: ' + result.activityName);
+            activity_name = result.activityName;
+        });
+    } catch(err){
+        activity_name = "Activity";
+    }
+}
+
 setInterval(function()
 {
     if(location.href == "https://firstclassenglish.learning.re/"){
         const nameElement = document.querySelector('li.has-submenu');
         if(nameElement){
-            let student_name = nameElement.childNodes[0].innerHTML;
+            student_name = nameElement.childNodes[0].innerHTML;
             saveStudentName(student_name);
         }
     }
+
+    if(location.href == "https://firstclassenglish.learning.re/webapp/current/"){
+        const nameElement = document.querySelector('div.t-title-text');
+        if(nameElement){
+            activity_string = nameElement.innerHTML.replaceAll('PP: ', '');
+            if(activity_string !== "Test"){
+                activity_name = activity_string;
+                saveActivityName(activity_name);
+            }
+        }
+    }
+
     if(recording_status == "Idle"){
         const exampleElement   = document.querySelector('p.l-example-term');
         const recordingElement = document.querySelector('div.recorder-recording');
@@ -54,6 +88,7 @@ let recording = false;
 function startRecording() {
     if (!recording) {
         getStudentName();
+        getActivityName();
         navigator.mediaDevices.getUserMedia({ audio: true })
         .then(stream => {
             mediaRecorder = new MediaRecorder(stream);
@@ -83,8 +118,9 @@ function stopRecording() {
   
 async function sendRecording() {
     if (recordingChunks.length > 0) {
-        let file_name = student_name.replaceAll(' ', '_');
-        file_name = file_name.concat(".wav");
+        let file_student_name = student_name.replaceAll(' ', '_');
+        let file_activity_name = activity_name.replaceAll(' ', '_');
+        file_name = file_student_name.concat("_", file_activity_name, ".wav");
         const blob = new Blob(recordingChunks, { type: 'audio/wav' });
         const formData = new FormData();
         formData.append('file', blob, file_name);
