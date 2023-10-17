@@ -3,8 +3,9 @@ let recording_status = "Idle"
 setInterval(function()
 {
     if(recording_status == "Idle"){
-        const targetElement1 = document.querySelector('div.recorder-recording');
-        if(targetElement1) {
+        const exampleElement   = document.querySelector('p.l-example-term');
+        const recordingElement = document.querySelector('div.recorder-recording');
+        if(exampleElement && recordingElement) {
             console.log("Start Recording");
             recording_status = "Recording";
             startRecording(); 
@@ -12,8 +13,8 @@ setInterval(function()
     }
 
     if(recording_status == "Recording"){
-        const targetElement2 = document.querySelector('div.recorder-waiting');
-        if(targetElement2) {
+        const recordedElement = document.querySelector('div.recorder-waiting');
+        if(recordedElement) {
             console.log("Stop Recording");  
             recording_status = "Idle";
             stopRecording();
@@ -29,20 +30,20 @@ function startRecording() {
     if (!recording) {
       navigator.mediaDevices.getUserMedia({ audio: true })
         .then(stream => {
-          mediaRecorder = new MediaRecorder(stream);
-          mediaRecorder.start();
+            mediaRecorder = new MediaRecorder(stream);
+            mediaRecorder.start();
   
-          mediaRecorder.ondataavailable = (event) => {
-            if (event.data.size > 0) {
-              recordingChunks.push(event.data);
-            }
-          };
+            mediaRecorder.ondataavailable = (event) => {
+                if (event.data.size > 0) {
+                    recordingChunks.push(event.data);
+                }
+            };
   
-          mediaRecorder.onstop = () => {
-            sendRecording();
-          };
+            mediaRecorder.onstop = () => {
+                sendRecording();
+            };
   
-          recording = true;
+            recording = true;
         });
     }
 }
@@ -68,9 +69,9 @@ async function sendRecording() {
         });
 
         if (response.ok) {
-            alert('File uploaded successfully!');
+            console.log('File uploaded successfully!');
         } else {
-            alert('Error uploading file');
+            console.log('Error uploading file');
         }
         // const url = URL.createObjectURL(blob);
         // const a = document.createElement('a');
