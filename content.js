@@ -40,17 +40,19 @@ function getActivityName(){
     }
 }
 
-setInterval(function()
-{
-    if(location.href == "https://firstclassenglish.learning.re/"){
+if(location.href == "https://firstclassenglish.learning.re/"){
+    setTimeout(() => {
         const nameElement = document.querySelector('li.has-submenu');
         if(nameElement){
             student_name = nameElement.childNodes[0].innerHTML;
             saveStudentName(student_name);
         }
-    }
+    }, 1000);
+}
 
-    if(location.href == "https://firstclassenglish.learning.re/webapp/current/"){
+
+if(location.href == "https://firstclassenglish.learning.re/webapp/current/"){
+    setTimeout(() => {
         const nameElement = document.querySelector('div.t-title-text');
         if(nameElement){
             activity_string = nameElement.innerHTML.replaceAll('PP: ', '');
@@ -59,8 +61,11 @@ setInterval(function()
                 saveActivityName(activity_name);
             }
         }
-    }
+    }, 1000);
+}
 
+setInterval(function()
+{
     if(recording_status == "Idle"){
         const exampleElement   = document.querySelector('p.l-example-term');
         const recordingElement = document.querySelector('div.recorder-recording');
